@@ -7,12 +7,12 @@ import (
 	"github.com/everyday-special/go_wordle/letter"
 )
 
-type guess struct {
+type Guess struct {
 	word          string
 	Letter_colors [5]letter.Letter
 }
 
-func NewGuess(new_guess string) *guess {
+func NewGuess(new_guess string) *Guess {
 	var letter_colors [5]letter.Letter
 	for i, ch := range new_guess {
 		letter_colors[i] = letter.Letter{
@@ -21,20 +21,20 @@ func NewGuess(new_guess string) *guess {
 		}
 	}
 
-	return &guess{
+	return &Guess{
 		Letter_colors: letter_colors,
 		word:          new_guess,
 	}
 }
 
-func (guess guess) Print() {
+func (guess Guess) Print() {
 	for _, l := range guess.Letter_colors {
 		fmt.Printf(l.Color+"%c"+colors.WHITE, l.Ch)
 	}
 	fmt.Println()
 }
 
-func (guess *guess) Check(secret_word string) bool {
+func (guess *Guess) Check(secret_word string) bool {
 	if guess.word == secret_word {
 		for i := range guess.Letter_colors {
 			guess.Letter_colors[i].Color = colors.GREEN
@@ -59,9 +59,13 @@ func (guess *guess) Check(secret_word string) bool {
 
 	// Check for partial matches
 	for i, letter := range guess.Letter_colors {
-		if secret_word_ch_counts[letter.Ch] > 0 && letter.Color != colors.GREEN {
+		if letter.Color == colors.GREEN {
+			continue
+		} else if secret_word_ch_counts[letter.Ch] > 0 {
 			secret_word_ch_counts[letter.Ch] -= 1
 			guess.Letter_colors[i].Color = colors.YELLOW
+		} else {
+			guess.Letter_colors[i].Color = colors.BLACK
 		}
 	}
 
